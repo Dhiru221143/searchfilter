@@ -1,25 +1,47 @@
-import logo from './logo.svg';
+
+import React,{useState,useEffect} from 'react';
+import  Axios from 'axios' ;
 import './App.css';
 
 function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
-}
+const[data,setData]=useState([])
+const[input,setInput]=useState('')
+const[output,setOutput]=useState([])
 
-export default App;
+useEffect( ()=>{
+  async function getData(){
+    const res=await Axios.get("https://disease.sh/v3/covid-19/countries")
+    setData(res.data)
+  }
+  getData()
+},[])
+
+useEffect( ()=>{
+  setOutput([])
+  data.filter(val=>{
+    if(val.country.toLowerCase().includes(input.toLowerCase())){
+      setOutput(output=>[...output,val])
+    }
+  })
+},[input])
+
+
+
+return (
+  <div className="App">
+  { /*search bar*/}
+  <div className="search-bar">
+    <input onChange={e=>setInput(e.target.value)} type="text" placeholder="search"/>
+  </div>
+
+  { /*OUTPUT*/}
+  <div className="output">
+    {
+      output.map(item=>(<p>{item.country}</p>))
+    }
+  </div>
+  </div>
+
+);
+  }
+export default  App
